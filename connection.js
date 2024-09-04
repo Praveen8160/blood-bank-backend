@@ -6,7 +6,7 @@ const databaseConnection = async (url) => {
       .then(() => console.log("connection Successfully"))
       .catch((err) => console.log(`Error to connect Database ${err}`));
   } catch (error) {
-    console.log(error);
+    console.log("connection error",error);
   }
 };
 module.exports = databaseConnection;
