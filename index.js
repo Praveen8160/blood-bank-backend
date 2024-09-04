@@ -18,7 +18,9 @@ DatabaseConnection(process.env.mongo);
 
 //Routers
 const DonorRouter = require("./Router/Donor.Router.js");
+const SearchRouter = require("./Router/Search.Router.js");
 app.use("/Donor", DonorRouter);
+app.use("/Search", SearchRouter);
 
 app.listen(process.env.PORT || 5000, () =>
   console.log(`server running in http://localhost:${process.env.PORT}`)
