@@ -1,4 +1,5 @@
 const Donor = require("../models/Donor.model.js");
+const { setUserToken } = require("../service/authebtication.js");
 const donorRegisterhandler = async (req, res) => {
   try {
     const {
@@ -15,7 +16,7 @@ const donorRegisterhandler = async (req, res) => {
     } = req.body;
     const exist = await Donor.findOne({ email: email });
     if (exist) {
-      console.log("exist")
+      console.log("exist");
       return res
         .status(400)
         .json({ success: false, message: "Email already exist" });
@@ -49,6 +50,41 @@ const donorRegisterhandler = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+
+const donorloginhnadler = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const donor = await Donor.findOne({ email });
+    if (donor) {
+      const checkpassword = await donor.checkpassword(password);
+      if (checkpassword) {
+        const userToken = setUserToken(donor, "donor");
+        res.cookie("token", userToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "None",
+        });
+        return res
+          .status(200)
+          .json({ success: true, message: "Login Successfully" });
+      } else {
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid Credentials" });
+      }
+    } else {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid Credentials" });
+    }
+  } catch (error) {
+    console.log("server error in Login", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Intenal Server Error" });
+  }
+};
 module.exports = {
   donorRegisterhandler,
+  donorloginhnadler,
 };
