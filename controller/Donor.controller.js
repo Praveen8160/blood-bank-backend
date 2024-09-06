@@ -78,7 +78,7 @@ const donorloginhnadler = async (req, res) => {
         .json({ success: false, message: "Invalid Credentials" });
     }
   } catch (error) {
-    console.log("server error in Login", error);
+    // console.log("server error in Login", error);
     return res
       .status(500)
       .json({ success: false, message: "Intenal Server Error" });
