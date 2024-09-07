@@ -1,5 +1,5 @@
 const BloodBank = require("../models/BloodBank.model.js");
-const { setUserToken } = require("../service/authebtication.js");
+const { setUserToken } = require("../service/authentication.js");
 const registerBloodBankHandler = async (req, res) => {
   try {
     const {
@@ -60,7 +60,7 @@ const loginBloodBankHandler = async (req, res) => {
       const checkpassword = await bank.checkpassword(password);
       if (checkpassword) {
         const userToken = setUserToken(bank, "bloodbank");
-        res.cookie("token", userToken, {
+        res.cookie("usertoken", userToken, {
           httpOnly: true,
           secure: true,
           sameSite: "None",
@@ -85,4 +85,21 @@ const loginBloodBankHandler = async (req, res) => {
       .json({ success: false, message: "Intenal Server Error" });
   }
 };
-module.exports = { registerBloodBankHandler, loginBloodBankHandler };
+const getBloodBankDatahandler = async (req, res) => {
+  try {
+    // console.log(req.user.id);
+    const bloodBank = await BloodBank.findOne({ _id: req.user.id });
+    if (bloodBank) {
+      res.status(200).json({ success: true, data: bloodBank });
+    } else {
+      res.status(404).json({ success: false, message: "Donor not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+module.exports = {
+  registerBloodBankHandler,
+  loginBloodBankHandler,
+  getBloodBankDatahandler,
+};

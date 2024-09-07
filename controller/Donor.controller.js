@@ -1,5 +1,5 @@
 const Donor = require("../models/Donor.model.js");
-const { setUserToken } = require("../service/authebtication.js");
+const { setUserToken } = require("../service/authentication.js");
 const donorRegisterhandler = async (req, res) => {
   try {
     const {
@@ -16,12 +16,11 @@ const donorRegisterhandler = async (req, res) => {
     } = req.body;
     const exist = await Donor.findOne({ email: email });
     if (exist) {
-      console.log("exist");
+      // console.log("exist");
       return res
         .status(400)
         .json({ success: false, message: "Email already exist" });
     }
-    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
     const newDonor = await Donor.create({
       fullname,
       email,
@@ -59,7 +58,8 @@ const donorloginhnadler = async (req, res) => {
       const checkpassword = await donor.checkpassword(password);
       if (checkpassword) {
         const userToken = setUserToken(donor, "donor");
-        res.cookie("token", userToken, {
+        // console.log(userToken);
+        res.cookie("usertoken", userToken, {
           httpOnly: true,
           secure: true,
           sameSite: "None",
@@ -84,7 +84,21 @@ const donorloginhnadler = async (req, res) => {
       .json({ success: false, message: "Intenal Server Error" });
   }
 };
+const getDonorDatahandler = async (req, res) => {
+  try {
+    // console.log(req.user.id);
+    const donor = await Donor.findOne({ _id: req.user.id });
+    if (donor) {
+      res.status(200).json({ success: true, data: donor });
+    } else {
+      res.status(404).json({ success: false, message: "Donor not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   donorRegisterhandler,
   donorloginhnadler,
+  getDonorDatahandler,
 };

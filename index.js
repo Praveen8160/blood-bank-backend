@@ -20,9 +20,11 @@ DatabaseConnection(process.env.mongo);
 const DonorRouter = require("./Router/Donor.Router.js");
 const SearchRouter = require("./Router/Search.Router.js");
 const BloodBankRouter = require("./Router/BloodBank.Router.js");
+const authRouter = require("./Router/Authentication.Router.js");
 app.use("/Donor", DonorRouter);
 app.use("/Search", SearchRouter);
 app.use("/bloodBank", BloodBankRouter);
+app.use("/Authentication",authRouter);
 
 app.listen(process.env.PORT || 5000, () =>
   console.log(`server running in http://localhost:${process.env.PORT}`)
