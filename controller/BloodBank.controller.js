@@ -112,14 +112,48 @@ const addbloodhandler = async (req, res) => {
         bloodgroup,
         bloodBank.availableBloods.get(bloodgroup) + parseInt(quantity)
       );
-    } else {
-      bloodBank.availableBloods.set(bloodgroup, quantity);
     }
+    // } else {
+    //   bloodBank.availableBloods.set(bloodgroup, quantity);
+    // }
     await bloodBank.save();
 
     res
       .status(200)
       .json({ success: true, message: "Blood Added Successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+const subbloodhandler = async (req, res) => {
+  try {
+    const { bloodgroup, quantity } = req.body;
+    const bloodBank = await BloodBank.findById(req.user.id);
+    if (!bloodBank) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Blood Bank not found" });
+    }
+    if (
+      bloodBank.availableBloods.has(bloodgroup) &&
+      bloodBank.availableBloods.get(bloodgroup) >= parseInt(quantity)
+    ) {
+      bloodBank.availableBloods.set(
+        bloodgroup,
+        bloodBank.availableBloods.get(bloodgroup) - parseInt(quantity)
+      );
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, message: "Quantity is too high" });
+    }
+    // else {
+    //   bloodBank.availableBloods.set(bloodgroup, quantity);
+    // }
+    await bloodBank.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Blood Subtracted Successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
@@ -136,11 +170,26 @@ const getAllBloodDatahandler = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-};
+}
+const getAvailableBlood = async (req, res) => {
+  try {
+    const bloodBank = await BloodBank.findById(req.params.id);
+    if (!bloodBank) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Blood Bank not found" });
+    }
+    res.status(200).json({ success: true, data: bloodBank.availableBloods });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+} 
 module.exports = {
   registerBloodBankHandler,
   loginBloodBankHandler,
   getBloodBankDatahandler,
   addbloodhandler,
-  getAllBloodDatahandler
+  getAllBloodDatahandler,
+  subbloodhandler,
+  getAvailableBlood
 };
