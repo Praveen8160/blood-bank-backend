@@ -170,7 +170,7 @@ const getAllBloodDatahandler = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-}
+};
 const getAvailableBlood = async (req, res) => {
   try {
     const bloodBank = await BloodBank.findById(req.params.id);
@@ -183,7 +183,15 @@ const getAvailableBlood = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-} 
+};
+const getTotalBloodBank = async (req, res) => {
+  try {
+    const totalBloodBank = await BloodBank.countDocuments();
+    res.status(200).json({ success: true, data: totalBloodBank });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   registerBloodBankHandler,
   loginBloodBankHandler,
@@ -191,5 +199,6 @@ module.exports = {
   addbloodhandler,
   getAllBloodDatahandler,
   subbloodhandler,
-  getAvailableBlood
+  getAvailableBlood,
+  getTotalBloodBank,
 };

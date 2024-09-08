@@ -97,8 +97,17 @@ const getDonorDatahandler = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+const getTotalDonorhandler = async (req, res) => {
+  try {
+    const totalDonor = await Donor.countDocuments();
+    res.status(200).json({ success: true, data: totalDonor });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   donorRegisterhandler,
   donorloginhnadler,
   getDonorDatahandler,
+  getTotalDonorhandler
 };

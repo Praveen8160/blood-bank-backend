@@ -7,6 +7,7 @@ const {
   getAllBloodDatahandler,
   subbloodhandler,
   getAvailableBlood,
+  getTotalBloodBank,
 } = require("../controller/BloodBank.controller");
 const checkAuthenticationCookie = require("../middleware/CookieAuthentication.middleware");
 const router = express.Router();
@@ -33,4 +34,5 @@ router.get(
   getAllBloodDatahandler
 );
 router.get("/getAvailableBlood/:id", getAvailableBlood);
+router.get("/getTotalBloodBank", getTotalBloodBank);
 module.exports = router;
