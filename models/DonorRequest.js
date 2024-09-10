@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const DonorRequestSchema = new mongoose.Schema({
   requester: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "donor",
+    ref: "Donor",
     required: true,
   },
   recipientId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "donor",
+    ref: "Donor",
     required: true,
   },
   bloodgroup: {

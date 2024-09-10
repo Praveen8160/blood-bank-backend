@@ -89,7 +89,102 @@ const bloodRequestD2Dhandler = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+const getBloodbakAllRequest = async (req, res) => {
+  try {
+    const allRequest = await bloodBankRequestModel
+      .find({ recipientId: req.user.id })
+      .populate({
+        path: "requester",
+        select: "bloodBankName mobile address",
+      });
+    // console.log(allRequest)
+    if (allRequest) {
+      return res.status(200).json({ success: true, data: allRequest });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Request not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+const updateBloodbakRequestStatus = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+    const request = await bloodBankRequestModel.findById(id);
+    if (request) {
+      request.status = status;
+      await request.save();
+      return res
+        .status(200)
+        .json({ success: true, message: "Request Updated" });
+    } else {
+      console.log("object");
+      return res
+        .status(404)
+        .json({ success: false, message: "Request not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+const getAllBloodbankRequestforBlood = async (req, res) => {
+  try {
+    const allRequest1 = await bloodBankRequestModel
+      .find({ requester: req.user.id })
+      .populate({
+        path: "recipientId",
+        select: "bloodBankName mobile address pincode",
+      });
+    // console.log(allRequest);
+    const allRequest2 = await DonorRequest.find({
+      requester: req.user.id,
+    }).populate({
+      path: "recipientId",
+      select: "fullname mobile address pincode",
+    });
+    const allRequest = [...allRequest1, ...allRequest2];
+    // console.log(allRequest2);
+    if (allRequest) {
+      return res.status(200).json({ success: true, data: allRequest });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Request not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+const getDonorRequest = async (req, res) => {
+  try {
+    const allRequest = await DonorRequest.find({
+      recipientId: req.user.id,
+    }).populate({
+      path: "requester",
+      select: "fullname mobile address pincode",
+    });
+    if (allRequest) {
+      return res.status(200).json({ success: true, data: allRequest });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Request not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   bloodRequestB2Bhandler,
   bloodRequestD2Dhandler,
+  getBloodbakAllRequest,
+  updateBloodbakRequestStatus,
+  getAllBloodbankRequestforBlood,
+  getDonorRequest,
 };
