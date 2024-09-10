@@ -140,16 +140,16 @@ const getAllBloodbankRequestforBlood = async (req, res) => {
         select: "bloodBankName mobile address pincode",
       });
     // console.log(allRequest);
-    const allRequest2 = await DonorRequest.find({
-      requester: req.user.id,
-    }).populate({
-      path: "recipientId",
-      select: "fullname mobile address pincode",
-    });
-    const allRequest = [...allRequest1, ...allRequest2];
+    // const allRequest2 = await DonorRequest.find({
+    //   requester: req.user.id,
+    // }).populate({
+    //   path: "recipientId",
+    //   select: "fullname mobile address pincode",
+    // });
+    // const allRequest = [...allRequest1, ...allRequest2];
     // console.log(allRequest2);
-    if (allRequest) {
-      return res.status(200).json({ success: true, data: allRequest });
+    if (allRequest1) {
+      return res.status(200).json({ success: true, data: allRequest1 });
     } else {
       return res
         .status(404)
@@ -180,6 +180,48 @@ const getDonorRequest = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+const updateDonorRequestStatus = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+    const request = await DonorRequest.findById(id);
+    if (request) {
+      request.status = status;
+      await request.save();
+      return res
+        .status(200)
+        .json({ success: true, message: "Request Updated" });
+    } else {
+      // console.log("object");
+      return res
+        .status(404)
+        .json({ success: false, message: "Request not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+const getAllDonorRequestforBlood = async (req, res) => {
+  try {
+    const allRequest = await DonorRequest.find({
+      requester: req.user.id,
+    }).populate({
+      path: "recipientId",
+      select: "fullname mobile address pincode",
+    });
+
+    if (allRequest) {
+      return res.status(200).json({ success: true, data: allRequest });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Request not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   bloodRequestB2Bhandler,
   bloodRequestD2Dhandler,
@@ -187,4 +229,6 @@ module.exports = {
   updateBloodbakRequestStatus,
   getAllBloodbankRequestforBlood,
   getDonorRequest,
+  updateDonorRequestStatus,
+  getAllDonorRequestforBlood,
 };

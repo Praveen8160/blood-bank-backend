@@ -6,9 +6,13 @@ const {
   updateBloodbakRequestStatus,
   getAllBloodbankRequestforBlood,
   getDonorRequest,
+  updateDonorRequestStatus,
+  getAllDonorRequestforBlood,
 } = require("../controller/Request.controller");
 const checkAuthenticationCookie = require("../middleware/CookieAuthentication.middleware");
 const router = express.Router();
+
+//send request for blood
 router.post(
   "/bloodRequestB2Bhandler",
   checkAuthenticationCookie("usertoken"),
@@ -19,6 +23,8 @@ router.post(
   checkAuthenticationCookie("usertoken"),
   bloodRequestD2Dhandler
 );
+
+// manage request for blood to blood bank and manage request blood bank to blood bank for blood
 router.get(
   "/getBloodbakAllRequest",
   checkAuthenticationCookie("usertoken"),
@@ -30,9 +36,17 @@ router.get(
   checkAuthenticationCookie("usertoken"),
   getAllBloodbankRequestforBlood
 );
+
+// manage request to Donor for blood and manage request Donor to Donor for blood
 router.get(
   "/getDonorRequest",
   checkAuthenticationCookie("usertoken"),
   getDonorRequest
+);
+router.put("/updateDonorRequestStatus", updateDonorRequestStatus);
+router.get(
+  "/getAllDonorRequestforBlood",
+  checkAuthenticationCookie("usertoken"),
+  getAllDonorRequestforBlood
 );
 module.exports = router;
