@@ -3,7 +3,7 @@ const checkAuthenticationCookie = (token) => {
   return (req, res, next) => {
     const Token = req.cookies[token];
     if (!Token) {
-      return next();
+      return res.status(403).json({ message: "unauthorized user" });
     }
     try {
       const payload = getUserToken(Token);
