@@ -2,6 +2,7 @@ const DonorRequest = require("../models/DonorRequest.js");
 const bloodBankRequestModel = require("../models/BloodBankRequest.js");
 const BloodBank = require("../models/BloodBank.model.js");
 const Donor = require("../models/Donor.model.js");
+const B2Drequest = require("../models/BloodbanktoDonorRequest.model.js");
 const bloodRequestB2Bhandler = async (req, res) => {
   try {
     const { bloodGroup, Quantity, reason, id } = req.body;
@@ -89,6 +90,48 @@ const bloodRequestD2Dhandler = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+const bloodRequestB2Dhandler = async (req, res) => {
+  try {
+    const { bloodgroup, Quantity, Reason, id } = req.body;
+    // console.log(req.body);
+    const recipient = await Donor.findById(id);
+    const requester = await BloodBank.findById(req.user.id);
+    if (!recipient) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Recipient not found" });
+    }
+    if (!requester) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Requester not found" });
+    }
+    const newBloodRequest = await B2Drequest.create({
+      requester: req.user.id,
+      recipientId: id,
+      bloodgroup: bloodgroup,
+      quantity: Quantity,
+      Reason: Reason,
+      status: "Pending",
+    });
+    if (newBloodRequest) {
+      console.log("done");
+      return res
+        .status(200)
+        .json({ success: true, message: "Request Created" });
+    } else {
+      console.log("object");
+      return res
+        .status(400)
+        .json({ success: false, message: "Request Failed" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
 const getBloodbakAllRequest = async (req, res) => {
   try {
     const allRequest = await bloodBankRequestModel
@@ -139,17 +182,15 @@ const getAllBloodbankRequestforBlood = async (req, res) => {
         path: "recipientId",
         select: "bloodBankName mobile address pincode",
       });
-    // console.log(allRequest);
-    // const allRequest2 = await DonorRequest.find({
-    //   requester: req.user.id,
-    // }).populate({
-    //   path: "recipientId",
-    //   select: "fullname mobile address pincode",
-    // });
-    // const allRequest = [...allRequest1, ...allRequest2];
-    // console.log(allRequest2);
-    if (allRequest1) {
-      return res.status(200).json({ success: true, data: allRequest1 });
+    const allRequest2 = await B2Drequest.find({
+      requester: req.user.id,
+    }).populate({
+      path: "recipientId",
+      select: "fullname mobile address pincode",
+    });
+    const allRequest = [...allRequest1, ...allRequest2];
+    if (allRequest) {
+      return res.status(200).json({ success: true, data: allRequest });
     } else {
       return res
         .status(404)
@@ -162,12 +203,20 @@ const getAllBloodbankRequestforBlood = async (req, res) => {
 };
 const getDonorRequest = async (req, res) => {
   try {
-    const allRequest = await DonorRequest.find({
+    const Request1 = await DonorRequest.find({
       recipientId: req.user.id,
     }).populate({
       path: "requester",
       select: "fullname mobile address pincode",
     });
+    const Request2 = await B2Drequest.find({
+      recipientId: req.user.id,
+    }).populate({
+      path: "requester",
+      select: "bloodBankName mobile address pincode",
+    });
+    const allRequest = [...Request1, ...Request2];
+    console.log(allRequest);
     if (allRequest) {
       return res.status(200).json({ success: true, data: allRequest });
     } else {
@@ -191,10 +240,18 @@ const updateDonorRequestStatus = async (req, res) => {
         .status(200)
         .json({ success: true, message: "Request Updated" });
     } else {
-      // console.log("object");
-      return res
-        .status(404)
-        .json({ success: false, message: "Request not found" });
+      const request2 = await B2Drequest.findById(id);
+      if (request2) {
+        request2.status = status;
+        await request2.save();
+        return res
+          .status(200)
+          .json({ success: true, message: "Request Updated" });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "Request not found" });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -225,6 +282,7 @@ const getAllDonorRequestforBlood = async (req, res) => {
 module.exports = {
   bloodRequestB2Bhandler,
   bloodRequestD2Dhandler,
+  bloodRequestB2Dhandler,
   getBloodbakAllRequest,
   updateBloodbakRequestStatus,
   getAllBloodbankRequestforBlood,

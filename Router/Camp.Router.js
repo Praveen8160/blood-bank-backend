@@ -7,11 +7,11 @@ const {
   updateDonorStatus,
   donorCampRegisteredHandler,
   cancelRegistration,
+  deleteCamphandler,
 } = require("../controller/Camp.controller");
 const checkAuthenticationCookie = require("../middleware/CookieAuthentication.middleware");
 const router = express.Router();
 router.post("/searchCamp", searchCampHandler);
-
 
 // Router For Blood Bank
 router.post("/AddCamp", checkAuthenticationCookie("usertoken"), AddCampHandler);
@@ -21,8 +21,7 @@ router.get(
   getallCamphandler
 );
 router.put("/updateDonorStatus", updateDonorStatus);
-
-
+router.delete("/deleteCamp", deleteCamphandler);
 
 // Router For Donor
 router.post(
@@ -30,6 +29,14 @@ router.post(
   checkAuthenticationCookie("usertoken"),
   donorCampRegisterHandler
 );
-router.get("/donorCampRegistered",checkAuthenticationCookie("usertoken"), donorCampRegisteredHandler);
-router.delete("/cancelRegistration", checkAuthenticationCookie("usertoken"), cancelRegistration);
+router.get(
+  "/donorCampRegistered",
+  checkAuthenticationCookie("usertoken"),
+  donorCampRegisteredHandler
+);
+router.delete(
+  "/cancelRegistration",
+  checkAuthenticationCookie("usertoken"),
+  cancelRegistration
+);
 module.exports = router;

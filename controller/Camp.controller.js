@@ -56,15 +56,10 @@ const donorCampRegisterHandler = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Camp not found" });
     }
-    // const donor = await Donor.findById(req.user.id);
-    // if (!donor) {
-    //   return res.status(400).json({ message: "Donor not found" });
-    // }
     const donor = camp.donorsRegistered.find(
       (donor) => donor.donorId == req.user.id
     );
     if (donor) {
-      console.log("already registerd");
       return res
         .status(400)
         .json({ success: false, message: "Donor already registered" });
@@ -180,6 +175,22 @@ const cancelRegistration = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+const deleteCamphandler = async (req, res) => {
+  try {
+    const camp = await Camp.findById(req.body.campId);
+    if (!camp) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Camp not found" });
+    }
+    await camp.deleteOne();
+    return res.status(200).json({ success: true, message: "Camp deleted" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   AddCampHandler,
   searchCampHandler,
@@ -188,4 +199,5 @@ module.exports = {
   updateDonorStatus,
   donorCampRegisteredHandler,
   cancelRegistration,
+  deleteCamphandler,
 };
