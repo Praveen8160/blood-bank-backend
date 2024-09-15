@@ -1,6 +1,9 @@
 const Camp = require("../models/Camp.model.js");
 const Donor = require("../models/Donor.model.js");
 const mongoose = require("mongoose");
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
 const AddCampHandler = async (req, res) => {
   try {
     const {
@@ -191,6 +194,41 @@ const deleteCamphandler = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+const downloadCertificate = async (req, res) => {
+  try {
+    const campId = req.params.campId;
+    const fileName = `certificate_${campId}.pdf`;
+    const certificatesDir = path.join(__dirname, "certificates");
+    const filePath = path.join(certificatesDir, fileName);
+
+    // Check if the 'certificates' directory exists, and create it if it doesn't
+    if (!fs.existsSync(certificatesDir)) {
+      fs.mkdirSync(certificatesDir, { recursive: true });
+    }
+
+    // Create a new PDF document
+    const pdfDoc = new PDFDocument();
+
+    // Save the PDF to a file
+    pdfDoc.pipe(fs.createWriteStream(filePath));
+
+    // Add some example content to the PDF
+    pdfDoc.text(`Certificate of Completion for Camp ID: ${campId}`);
+    pdfDoc.end();
+    console.log("object");
+    // Respond with the download link after the PDF is generated
+    res.json({
+      success: true,
+      message: "Certificate generated successfully",
+      downloadLink: `${req.protocol}://${req.get(
+        "host"
+      )}/certificates/${fileName}`,
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error generating certificate" });
+  }
+};
 module.exports = {
   AddCampHandler,
   searchCampHandler,
@@ -200,4 +238,5 @@ module.exports = {
   donorCampRegisteredHandler,
   cancelRegistration,
   deleteCamphandler,
+  downloadCertificate,
 };

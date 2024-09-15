@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -12,7 +13,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json()); //for accept json data
 app.use(express.urlencoded({ extended: false }));
-
+app.use('/certificates', express.static(path.join(__dirname,'controller', 'certificates')));
 const DatabaseConnection = require("./connection.js");
 DatabaseConnection(process.env.mongo);
 

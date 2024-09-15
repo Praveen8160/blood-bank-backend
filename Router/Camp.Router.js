@@ -39,4 +39,5 @@ router.delete(
   checkAuthenticationCookie("usertoken"),
   cancelRegistration
 );
+// router.get("/download-certificate/:campId", downloadCertificate);
 module.exports = router;
