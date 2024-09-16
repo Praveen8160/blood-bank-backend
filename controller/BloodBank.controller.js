@@ -67,7 +67,7 @@ const loginBloodBankHandler = async (req, res) => {
         });
         return res
           .status(200)
-          .json({ success: true, message: "Login Successfully" });
+          .json({ success: true, message: "Login Successfully", id: bank._id });
       } else {
         return res
           .status(401)

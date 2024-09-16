@@ -3,12 +3,15 @@ const bloodBankRequestModel = require("../models/BloodBankRequest.js");
 const BloodBank = require("../models/BloodBank.model.js");
 const Donor = require("../models/Donor.model.js");
 const B2Drequest = require("../models/BloodbanktoDonorRequest.model.js");
+const { getIo, getActiveUsers } = require("../service/socketHandler.js");
+const MessageModel = require("../models/Message.model.js");
 const bloodRequestB2Bhandler = async (req, res) => {
   try {
     const { bloodGroup, Quantity, reason, id } = req.body;
-    console.log(req.body);
+
     const recipient = await BloodBank.findById(id);
     const requester = await BloodBank.findById(req.user.id);
+
     if (!recipient) {
       return res
         .status(404)
@@ -19,6 +22,7 @@ const bloodRequestB2Bhandler = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Requester not found" });
     }
+
     const newBloodRequest = await bloodBankRequestModel.create({
       requester: req.user.id,
       recipientId: id,
@@ -27,13 +31,29 @@ const bloodRequestB2Bhandler = async (req, res) => {
       Reason: reason,
       status: "Pending",
     });
+
     if (newBloodRequest) {
-      console.log("done");
+      const recipientSocketId = getActiveUsers().get(id);
+      console.log("recipientSocketId", getActiveUsers());
+      console.log(recipientSocketId);
+      if (recipientSocketId) {
+        getIo()
+          .to(recipientSocketId)
+          .emit("newBloodRequest", {
+            message: `New blood request for ${bloodGroup} blood}`,
+          });
+        // console.log(`Notification sent to blood bank ${id}`);
+      } else if (!recipientSocketId) {
+        await MessageModel.create({
+          recipient: id, // Recipient userId
+          message: `New blood request for ${bloodGroup} blood `,
+          status: "unread",
+        });
+      }
       return res
         .status(200)
         .json({ success: true, message: "Request Created" });
     } else {
-      console.log("object");
       return res
         .status(400)
         .json({ success: false, message: "Request Failed" });
