@@ -64,9 +64,11 @@ const donorloginhnadler = async (req, res) => {
           secure: true,
           sameSite: "None",
         });
-        return res
-          .status(200)
-          .json({ success: true, message: "Login Successfully" });
+        return res.status(200).json({
+          success: true,
+          message: "Login Successfully",
+          id: donor._id,
+        });
       } else {
         return res
           .status(401)
@@ -109,5 +111,5 @@ module.exports = {
   donorRegisterhandler,
   donorloginhnadler,
   getDonorDatahandler,
-  getTotalDonorhandler
+  getTotalDonorhandler,
 };

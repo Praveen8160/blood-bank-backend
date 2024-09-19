@@ -9,6 +9,7 @@ const {
   updateDonorRequestStatus,
   getAllDonorRequestforBlood,
   bloodRequestB2Dhandler,
+  removeallnotification,
 } = require("../controller/Request.controller");
 const checkAuthenticationCookie = require("../middleware/CookieAuthentication.middleware");
 const router = express.Router();
@@ -54,4 +55,7 @@ router.get(
   checkAuthenticationCookie("usertoken"),
   getAllDonorRequestforBlood
 );
+
+// missing notification
+router.delete("/removeAll", removeallnotification);
 module.exports = router;

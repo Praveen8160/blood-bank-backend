@@ -18,7 +18,6 @@ const initSocket = (server) => {
       activeUsers.set(userId, socket.id);
       console.log(`User ${userId} registered with socket ID ${socket.id}`);
       try {
-        // Retrieve missed messages
         const missedMessages = await MessageModel.find({
           recipient: userId,
           status: "unread",
@@ -29,7 +28,7 @@ const initSocket = (server) => {
           io.to(socket.id).emit("newBloodRequest", {
             message: message.message,
           });
-          console.log(`Emitted message to ${userId}: ${message.message}`);
+          // console.log(`Emitted message to ${userId}: ${message.message}`);
         });
 
         // Only after successfully sending the messages, update their status to "read"

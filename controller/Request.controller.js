@@ -5,6 +5,20 @@ const Donor = require("../models/Donor.model.js");
 const B2Drequest = require("../models/BloodbanktoDonorRequest.model.js");
 const { getIo, getActiveUsers } = require("../service/socketHandler.js");
 const MessageModel = require("../models/Message.model.js");
+const isrecipientOnline = (recipientSocketId, bloodGroup, requester) => {
+  getIo()
+    .to(recipientSocketId)
+    .emit("newBloodRequest", {
+      message: `New blood request for ${bloodGroup} blood from ${requester}`,
+    });
+};
+const isrecipientOofOnline = async (id, bloodGroup, requester) => {
+  await MessageModel.create({
+    recipient: id, // Recipient userId
+    message: `New blood request for ${bloodGroup} blood from ${requester}`,
+    status: "unread",
+  });
+};
 const bloodRequestB2Bhandler = async (req, res) => {
   try {
     const { bloodGroup, Quantity, reason, id } = req.body;
@@ -22,7 +36,7 @@ const bloodRequestB2Bhandler = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Requester not found" });
     }
-
+    console.log(requester);
     const newBloodRequest = await bloodBankRequestModel.create({
       requester: req.user.id,
       recipientId: id,
@@ -34,21 +48,17 @@ const bloodRequestB2Bhandler = async (req, res) => {
 
     if (newBloodRequest) {
       const recipientSocketId = getActiveUsers().get(id);
-      console.log("recipientSocketId", getActiveUsers());
-      console.log(recipientSocketId);
+      // console.log("recipientSocketId", getActiveUsers());
+      // console.log(recipientSocketId);
       if (recipientSocketId) {
-        getIo()
-          .to(recipientSocketId)
-          .emit("newBloodRequest", {
-            message: `New blood request for ${bloodGroup} blood}`,
-          });
         // console.log(`Notification sent to blood bank ${id}`);
+        isrecipientOnline(
+          recipientSocketId,
+          bloodGroup,
+          requester.bloodBankName
+        );
       } else if (!recipientSocketId) {
-        await MessageModel.create({
-          recipient: id, // Recipient userId
-          message: `New blood request for ${bloodGroup} blood `,
-          status: "unread",
-        });
+        isrecipientOofOnline(id, bloodGroup, requester.bloodBankName);
       }
       return res
         .status(200)
@@ -93,7 +103,12 @@ const bloodRequestD2Dhandler = async (req, res) => {
       status: "Pending",
     });
     if (newBloodRequest) {
-      //   console.log("done");
+      const recipientSocketId = getActiveUsers().get(id);
+      if (recipientSocketId) {
+        isrecipientOnline(recipientSocketId, bloodgroup, requester.fullname);
+      } else if (!recipientSocketId) {
+        isrecipientOofOnline(id, bloodgroup, requester.fullname);
+      }
       return res
         .status(200)
         .json({ success: true, message: "Request Created" });
@@ -135,7 +150,16 @@ const bloodRequestB2Dhandler = async (req, res) => {
       status: "Pending",
     });
     if (newBloodRequest) {
-      console.log("done");
+      const recipientSocketId = getActiveUsers().get(id);
+      if (recipientSocketId) {
+        isrecipientOnline(
+          recipientSocketId,
+          bloodgroup,
+          requester.bloodBankName
+        );
+      } else if (!recipientSocketId) {
+        isrecipientOofOnline(id, bloodgroup, requester.bloodBankName);
+      }
       return res
         .status(200)
         .json({ success: true, message: "Request Created" });
@@ -160,7 +184,6 @@ const getBloodbakAllRequest = async (req, res) => {
         path: "requester",
         select: "bloodBankName mobile address",
       });
-    // console.log(allRequest)
     if (allRequest) {
       return res.status(200).json({ success: true, data: allRequest });
     } else {
@@ -299,6 +322,19 @@ const getAllDonorRequestforBlood = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+const removeallnotification= async (req, res) => {
+  try {
+    const allRequest = await MessageModel.deleteMany({
+      recipient: req.user.id,
+    });
+    
+    return res.status(200).json({ success: true, message: "Notification removed" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   bloodRequestB2Bhandler,
   bloodRequestD2Dhandler,
@@ -309,4 +345,5 @@ module.exports = {
   getDonorRequest,
   updateDonorRequestStatus,
   getAllDonorRequestforBlood,
+  removeallnotification
 };
