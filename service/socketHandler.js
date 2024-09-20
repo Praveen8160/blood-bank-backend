@@ -2,7 +2,7 @@ const socketIo = require("socket.io");
 const MessageModel = require("../models/Message.model.js");
 let io;
 const activeUsers = new Map();
-
+const redisclient = require("./Redis.js");
 const initSocket = (server) => {
   io = socketIo(server, {
     pingTimeout: 60000,
@@ -18,31 +18,22 @@ const initSocket = (server) => {
       activeUsers.set(userId, socket.id);
       console.log(`User ${userId} registered with socket ID ${socket.id}`);
       try {
-        const missedMessages = await MessageModel.find({
-          recipient: userId,
-          status: "unread",
-        });
-
+        // const missedMessages = await MessageModel.find({
+        //   recipient: userId,
+        //   status: "unread",
+        // });
+        const missedMessages = await redisclient.lRange(
+          `notifications:${userId}`,
+          0,
+          -1
+        );
+        console.log(missedMessages);
         // Emit all missed messages to the user
         missedMessages.forEach((message) => {
           io.to(socket.id).emit("newBloodRequest", {
-            message: message.message,
+            message
           });
-          // console.log(`Emitted message to ${userId}: ${message.message}`);
         });
-
-        // Only after successfully sending the messages, update their status to "read"
-        // setImmediate(async () => {
-        //   try {
-        //     const result = await MessageModel.deleteMany({
-        //       recipient: userId,
-        //       status: "unread",
-        //     });
-        //     console.log(`Messages marked as read for ${userId}:`, result);
-        //   } catch (updateError) {
-        //     console.error("Error updating message status:", updateError);
-        //   }
-        // });
       } catch (error) {
         console.error("Error handling missed messages:", error);
       }

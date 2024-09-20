@@ -5,7 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 const { initSocket } = require("./service/socketHandler.js");
-
+const redisclient = require("./service/Redis.js");
 const app = express();
 const server = http.createServer(app);
 

@@ -5,6 +5,7 @@ const Donor = require("../models/Donor.model.js");
 const B2Drequest = require("../models/BloodbanktoDonorRequest.model.js");
 const { getIo, getActiveUsers } = require("../service/socketHandler.js");
 const MessageModel = require("../models/Message.model.js");
+const redisClient = require("../service/Redis.js");
 const isrecipientOnline = (recipientSocketId, bloodGroup, requester) => {
   getIo()
     .to(recipientSocketId)
@@ -12,12 +13,17 @@ const isrecipientOnline = (recipientSocketId, bloodGroup, requester) => {
       message: `New blood request for ${bloodGroup} blood from ${requester}`,
     });
 };
+// const isrecipientOofOnline = async (id, bloodGroup, requester) => {
+//   await MessageModel.create({
+//     recipient: id, // Recipient userId
+//     message: `New blood request for ${bloodGroup} blood from ${requester}`,
+//     status: "unread",
+//   });
+// };
 const isrecipientOofOnline = async (id, bloodGroup, requester) => {
-  await MessageModel.create({
-    recipient: id, // Recipient userId
-    message: `New blood request for ${bloodGroup} blood from ${requester}`,
-    status: "unread",
-  });
+  const notification = `New blood request for ${bloodGroup} blood from ${requester}`;
+  await redisClient.lPush(`notifications:${id}`, notification);
+  await redisClient.expire(`notifications:${id}`, 172800);
 };
 const bloodRequestB2Bhandler = async (req, res) => {
   try {
@@ -48,10 +54,7 @@ const bloodRequestB2Bhandler = async (req, res) => {
 
     if (newBloodRequest) {
       const recipientSocketId = getActiveUsers().get(id);
-      // console.log("recipientSocketId", getActiveUsers());
-      // console.log(recipientSocketId);
       if (recipientSocketId) {
-        // console.log(`Notification sent to blood bank ${id}`);
         isrecipientOnline(
           recipientSocketId,
           bloodGroup,
@@ -323,13 +326,15 @@ const getAllDonorRequestforBlood = async (req, res) => {
   }
 };
 
-const removeallnotification= async (req, res) => {
+const removeallnotification = async (req, res) => {
   try {
     const allRequest = await MessageModel.deleteMany({
       recipient: req.user.id,
     });
-    
-    return res.status(200).json({ success: true, message: "Notification removed" });
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Notification removed" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -345,5 +350,5 @@ module.exports = {
   getDonorRequest,
   updateDonorRequestStatus,
   getAllDonorRequestforBlood,
-  removeallnotification
+  removeallnotification,
 };
