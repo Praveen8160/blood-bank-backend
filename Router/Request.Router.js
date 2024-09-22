@@ -57,5 +57,5 @@ router.get(
 );
 
 // missing notification
-router.delete("/removeAll", removeallnotification);
+router.delete("/removeAll",checkAuthenticationCookie("usertoken"), removeallnotification);
 module.exports = router;

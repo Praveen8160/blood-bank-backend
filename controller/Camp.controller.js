@@ -4,6 +4,21 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+const redisClient = require("../service/Redis.js");
+const { getIo, getActiveUsers } = require("../service/socketHandler.js");
+
+const isrecipientOnline = (recipientSocketId, donorName, campname) => {
+  getIo()
+    .to(recipientSocketId)
+    .emit("newRequest", {
+      message: `New donor ${donorName} register in ${campname} Camp`,
+    });
+};
+const isrecipientOofOnline = async (id, donorName, campname) => {
+  const notification = `New donor ${donorName} register in ${campname} Camp`;
+  await redisClient.lPush(`notifications:${id}`, notification);
+  await redisClient.expire(`notifications:${id}`, 172800);
+};
 const AddCampHandler = async (req, res) => {
   try {
     const {
@@ -59,6 +74,8 @@ const donorCampRegisterHandler = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Camp not found" });
     }
+    const bankid = camp.bloodBankId;
+    const campname = camp.campName;
     const donor = camp.donorsRegistered.find(
       (donor) => donor.donorId == req.user.id
     );
@@ -75,6 +92,12 @@ const donorCampRegisterHandler = async (req, res) => {
       status: "Pending",
     });
     await camp.save();
+    const recipientSocketId = getActiveUsers().get(bankid.toString());
+    if (recipientSocketId) {
+      isrecipientOnline(recipientSocketId, donorName, campname);
+    } else if (!recipientSocketId) {
+      isrecipientOofOnline(bankid, donorName, campname);
+    }
     return res.status(201).json({ success: true, message: "Donor Registered" });
   } catch (error) {
     return res
@@ -85,7 +108,6 @@ const donorCampRegisterHandler = async (req, res) => {
 const getallCamphandler = async (req, res) => {
   try {
     const camps = await Camp.find({ bloodBankId: req.user.id });
-    // console.log(camps);
     return res.status(200).json({ success: true, data: camps });
   } catch (error) {
     return res
@@ -108,6 +130,18 @@ const updateDonorStatus = async (req, res) => {
     }
     donor.status = status;
     await camp.save();
+    const recipientSocketId = getActiveUsers().get(donorid);
+    if (recipientSocketId) {
+      getIo()
+        .to(recipientSocketId)
+        .emit("newRequest", {
+          message: `donation status ${status} for ${donor.bloodType} blood from ${camp.campName}`,
+        });
+    } else if (!recipientSocketId) {
+      const notification = `donation status ${status} for ${donor.bloodType} blood from ${camp.campName}`;
+      await redisClient.lPush(`notifications:${donorid}`, notification);
+      await redisClient.expire(`notifications:${donorid}`, 172800);
+    }
     return res
       .status(200)
       .json({ success: true, message: "Donor status updated" });
@@ -172,7 +206,7 @@ const cancelRegistration = async (req, res) => {
     await camp.save();
     return res.status(200).json({ success: true, message: "Donor cancelled" });
   } catch (error) {
-    console.log("error", error);
+    // console.log("error", error);
     return res
       .status(500)
       .json({ success: false, message: "Internal Server Error" });
@@ -215,7 +249,6 @@ const downloadCertificate = async (req, res) => {
     // Add some example content to the PDF
     pdfDoc.text(`Certificate of Completion for Camp ID: ${campId}`);
     pdfDoc.end();
-    console.log("object");
     // Respond with the download link after the PDF is generated
     res.json({
       success: true,

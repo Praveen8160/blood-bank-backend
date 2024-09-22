@@ -30,7 +30,7 @@ const initSocket = (server) => {
         console.log(missedMessages);
         // Emit all missed messages to the user
         missedMessages.forEach((message) => {
-          io.to(socket.id).emit("newBloodRequest", {
+          io.to(socket.id).emit("newRequest", {
             message
           });
         });

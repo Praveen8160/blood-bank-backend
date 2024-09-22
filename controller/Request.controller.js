@@ -6,10 +6,11 @@ const B2Drequest = require("../models/BloodbanktoDonorRequest.model.js");
 const { getIo, getActiveUsers } = require("../service/socketHandler.js");
 const MessageModel = require("../models/Message.model.js");
 const redisClient = require("../service/Redis.js");
+
 const isrecipientOnline = (recipientSocketId, bloodGroup, requester) => {
   getIo()
     .to(recipientSocketId)
-    .emit("newBloodRequest", {
+    .emit("newRequest", {
       message: `New blood request for ${bloodGroup} blood from ${requester}`,
     });
 };
@@ -328,10 +329,9 @@ const getAllDonorRequestforBlood = async (req, res) => {
 
 const removeallnotification = async (req, res) => {
   try {
-    const allRequest = await MessageModel.deleteMany({
-      recipient: req.user.id,
-    });
-
+    const userid = req.user.id;
+    const deletenotification=await redisClient.del(`notifications:${userid}`)
+    console.log(deletenotification)
     return res
       .status(200)
       .json({ success: true, message: "Notification removed" });
