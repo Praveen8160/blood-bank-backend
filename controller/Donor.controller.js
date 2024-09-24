@@ -88,10 +88,46 @@ const donorloginhnadler = async (req, res) => {
 };
 const getDonorDatahandler = async (req, res) => {
   try {
-    // console.log(req.user.id);
-    const donor = await Donor.findOne({ _id: req.user.id });
+    const donor = await Donor.findOne({ _id: req.user.id }).select(
+      "fullname email address mobile bloodGroup state district pincode age"
+    );
     if (donor) {
       res.status(200).json({ success: true, data: donor });
+    } else {
+      res.status(404).json({ success: false, message: "Donor not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+const UpdateDonorDatahandler = async (req, res) => {
+  try {
+    const donor = await Donor.findOne({ _id: req.user.id });
+    console.log(req.body);
+    if (donor) {
+      const {
+        fullname,
+        email,
+
+        address,
+        mobile,
+        bloodGroup,
+        state,
+        district,
+        pincode,
+        age,
+      } = req.body;
+      donor.fullname = fullname;
+      donor.email = email;
+      donor.address = address;
+      donor.mobile = mobile;
+      donor.bloodGroup = bloodGroup;
+      donor.state = state;
+      donor.district = district;
+      donor.pincode = pincode;
+      donor.age = age;
+      await donor.save();
+      res.status(200).json({ success: true, message: "Profile Updated" });
     } else {
       res.status(404).json({ success: false, message: "Donor not found" });
     }
@@ -112,4 +148,5 @@ module.exports = {
   donorloginhnadler,
   getDonorDatahandler,
   getTotalDonorhandler,
+  UpdateDonorDatahandler,
 };
