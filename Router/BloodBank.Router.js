@@ -32,7 +32,7 @@ router.post(
 router.get(
   "/getAllBloodData",
   checkAuthenticationCookie("usertoken"),
-  getAllBloodDatahandler
+  getAllBloodDatahandler  
 );
 router.get("/getAvailableBlood/:id", getAvailableBlood);
 router.get("/getTotalBloodBank", getTotalBloodBank);

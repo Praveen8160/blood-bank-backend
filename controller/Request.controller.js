@@ -246,6 +246,38 @@ const getAllBloodbankRequestforBlood = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+const deletebloodbankbloodRequest = async (req, res) => {
+  try {
+    const id = req.body.id;
+    console.log(id);
+    const request = await bloodBankRequestModel.findById(
+      new mongoose.Types.ObjectId(id)
+    );
+    if (request) {
+      await bloodBankRequestModel.deleteOne(new mongoose.Types.ObjectId(id));
+      return res
+        .status(200)
+        .json({ success: true, message: "Request deleted" });
+    } else {
+      const request2 = await B2Drequest.findById(
+        new mongoose.Types.ObjectId(id)
+      );
+      if (request2) {
+        await B2Drequest.deleteOne(new mongoose.Types.ObjectId(id));
+        return res
+          .status(200)
+          .json({ success: true, message: "Request deleted" });
+      } else {
+        return res
+          .status(404)
+          .json({ success: false, message: "Request not found" });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 const getDonorRequest = async (req, res) => {
   try {
     const Request1 = await DonorRequest.find({
@@ -326,7 +358,9 @@ const getAllDonorRequestforBlood = async (req, res) => {
 const deletebloodRequest = async (req, res) => {
   try {
     const id = req.body.id;
-    const request = await DonorRequest.findById(new mongoose.Types.ObjectId(id));
+    const request = await DonorRequest.findById(
+      new mongoose.Types.ObjectId(id)
+    );
     if (request) {
       await DonorRequest.deleteOne(new mongoose.Types.ObjectId(id));
       return res
@@ -363,6 +397,7 @@ module.exports = {
   getBloodbakAllRequest,
   updateBloodbakRequestStatus,
   getAllBloodbankRequestforBlood,
+  deletebloodbankbloodRequest,
   getDonorRequest,
   updateDonorRequestStatus,
   getAllDonorRequestforBlood,
