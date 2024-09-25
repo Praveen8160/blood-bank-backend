@@ -4,8 +4,8 @@ const BloodBank = require("../models/BloodBank.model.js");
 const Donor = require("../models/Donor.model.js");
 const B2Drequest = require("../models/BloodbanktoDonorRequest.model.js");
 const { getIo, getActiveUsers } = require("../service/socketHandler.js");
-const MessageModel = require("../models/Message.model.js");
 const redisClient = require("../service/Redis.js");
+const { default: mongoose } = require("mongoose");
 
 const isrecipientOnline = (recipientSocketId, bloodGroup, requester) => {
   getIo()
@@ -117,7 +117,6 @@ const bloodRequestD2Dhandler = async (req, res) => {
         .status(200)
         .json({ success: true, message: "Request Created" });
     } else {
-      //   console.log("error");
       return res
         .status(400)
         .json({ success: false, message: "Request Failed" });
@@ -132,7 +131,6 @@ const bloodRequestD2Dhandler = async (req, res) => {
 const bloodRequestB2Dhandler = async (req, res) => {
   try {
     const { bloodgroup, Quantity, Reason, id } = req.body;
-    // console.log(req.body);
     const recipient = await Donor.findById(id);
     const requester = await BloodBank.findById(req.user.id);
     if (!recipient) {
@@ -263,7 +261,6 @@ const getDonorRequest = async (req, res) => {
       select: "bloodBankName mobile address pincode",
     });
     const allRequest = [...Request1, ...Request2];
-    console.log(allRequest);
     if (allRequest) {
       return res.status(200).json({ success: true, data: allRequest });
     } else {
@@ -326,12 +323,31 @@ const getAllDonorRequestforBlood = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+const deletebloodRequest = async (req, res) => {
+  try {
+    const id = req.body.id;
+    const request = await DonorRequest.findById(new mongoose.Types.ObjectId(id));
+    if (request) {
+      await DonorRequest.deleteOne(new mongoose.Types.ObjectId(id));
+      return res
+        .status(200)
+        .json({ success: true, message: "Request deleted" });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Request not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 
 const removeallnotification = async (req, res) => {
   try {
     const userid = req.user.id;
-    const deletenotification=await redisClient.del(`notifications:${userid}`)
-    console.log(deletenotification)
+    const deletenotification = await redisClient.del(`notifications:${userid}`);
+    console.log(deletenotification);
     return res
       .status(200)
       .json({ success: true, message: "Notification removed" });
@@ -350,5 +366,6 @@ module.exports = {
   getDonorRequest,
   updateDonorRequestStatus,
   getAllDonorRequestforBlood,
+  deletebloodRequest,
   removeallnotification,
 };

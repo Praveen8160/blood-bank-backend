@@ -10,6 +10,7 @@ const {
   getAllDonorRequestforBlood,
   bloodRequestB2Dhandler,
   removeallnotification,
+  deletebloodRequest,
 } = require("../controller/Request.controller");
 const checkAuthenticationCookie = require("../middleware/CookieAuthentication.middleware");
 const router = express.Router();
@@ -30,6 +31,7 @@ router.post(
   checkAuthenticationCookie("usertoken"),
   bloodRequestB2Dhandler
 );
+
 // manage request for blood to blood bank and manage request blood bank to blood bank for blood
 router.get(
   "/getBloodbakAllRequest",
@@ -55,7 +57,8 @@ router.get(
   checkAuthenticationCookie("usertoken"),
   getAllDonorRequestforBlood
 );
+router.delete("/deleteDonorbloodRequest",deletebloodRequest)
 
-// missing notification
+// Remove missing notification
 router.delete("/removeAll",checkAuthenticationCookie("usertoken"), removeallnotification);
 module.exports = router;
