@@ -87,8 +87,9 @@ const loginBloodBankHandler = async (req, res) => {
 };
 const getBloodBankDatahandler = async (req, res) => {
   try {
-    // console.log(req.user.id);
-    const bloodBank = await BloodBank.findOne({ _id: req.user.id });
+    const bloodBank = await BloodBank.findOne({ _id: req.user.id }).select(
+      "bloodBankName parentHospital website mobile email category state district address pincode"
+    );
     if (bloodBank) {
       res.status(200).json({ success: true, data: bloodBank });
     } else {
@@ -113,9 +114,6 @@ const addbloodhandler = async (req, res) => {
         bloodBank.availableBloods.get(bloodgroup) + parseInt(quantity)
       );
     }
-    // } else {
-    //   bloodBank.availableBloods.set(bloodgroup, quantity);
-    // }
     await bloodBank.save();
 
     res
@@ -192,6 +190,46 @@ const getTotalBloodBank = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+const updateBloodbankDatahandler = async (req, res) => {
+  try {
+    const bloodBank = await BloodBank.findById(req.user.id);
+    if (!bloodBank) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Blood Bank not found" });
+    }
+    const {
+      bloodBankName,
+      parentHospital,
+      website,
+      mobile,
+      email,
+      category,
+      state,
+      district,
+      address,
+      pincode,
+    } = req.body;
+    bloodBank.bloodBankName = bloodBankName;
+    bloodBank.parentHospital = parentHospital;
+    bloodBank.website = website;
+    bloodBank.mobile = mobile;
+    bloodBank.email = email;
+    bloodBank.category = category;
+    bloodBank.state = state;
+    bloodBank.district = district;
+    bloodBank.address = address;
+    bloodBank.pincode = pincode;
+    await bloodBank.save();
+    return res
+      .status(200)
+      .json({ success: true, message: "Blood Bank Updated" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   registerBloodBankHandler,
   loginBloodBankHandler,
@@ -201,4 +239,5 @@ module.exports = {
   subbloodhandler,
   getAvailableBlood,
   getTotalBloodBank,
+  updateBloodbankDatahandler,
 };
