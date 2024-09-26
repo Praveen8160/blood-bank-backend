@@ -10,11 +10,18 @@ const {
   deleteCamphandler,
 } = require("../controller/Camp.controller");
 const checkAuthenticationCookie = require("../middleware/CookieAuthentication.middleware");
+const upload = require("../middleware/multer.middleware");
 const router = express.Router();
+
 router.post("/searchCamp", searchCampHandler);
 
 // Router For Blood Bank
-router.post("/AddCamp", checkAuthenticationCookie("usertoken"), AddCampHandler);
+router.post(
+  "/AddCamp",
+  checkAuthenticationCookie("usertoken"),
+  upload.single("image"),
+  AddCampHandler
+);
 router.get(
   "/allCamp",
   checkAuthenticationCookie("usertoken"),

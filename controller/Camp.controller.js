@@ -6,6 +6,7 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const redisClient = require("../service/Redis.js");
 const { getIo, getActiveUsers } = require("../service/socketHandler.js");
+const UploadOnCloudinary = require("../service/cloudinary.js");
 
 const isrecipientOnline = (recipientSocketId, donorName, campname) => {
   getIo()
@@ -20,6 +21,10 @@ const isrecipientOofOnline = async (id, donorName, campname) => {
   await redisClient.expire(`notifications:${id}`, 172800);
 };
 const AddCampHandler = async (req, res) => {
+  const imagepath = req.file.path;
+  if (!imagepath) {
+    return res.json({ errors: "Image is required" });
+  }
   try {
     const {
       campName,
@@ -35,8 +40,10 @@ const AddCampHandler = async (req, res) => {
     if (existingCamp) {
       return res.status(400).json({ message: "Camp name already exists" });
     }
+    const Image = await UploadOnCloudinary(req.file.path);
     const newCamp = new Camp({
       campName,
+      Image: Image.secure_url,
       state,
       district,
       address,

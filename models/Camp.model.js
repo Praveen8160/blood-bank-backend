@@ -6,6 +6,10 @@ const CampSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    Image: {
+      type: String,
+      required: true,
+    },
     state: {
       type: String,
       required: true,
