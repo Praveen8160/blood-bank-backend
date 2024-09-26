@@ -1,5 +1,6 @@
 const Donor = require("../models/Donor.model.js");
 const { setUserToken } = require("../service/authentication.js");
+const axios = require("axios");
 const donorRegisterhandler = async (req, res) => {
   try {
     const {
@@ -11,15 +12,38 @@ const donorRegisterhandler = async (req, res) => {
       bloodGroup,
       state,
       district,
+      latitude,
+      longitude,
       pincode,
       age,
     } = req.body;
+    console.log(latitude);
+    console.log(longitude);
     const exist = await Donor.findOne({ email: email });
     if (exist) {
-      // console.log("exist");
       return res
         .status(400)
         .json({ success: false, message: "Email already exist" });
+    }
+    let location = { latitude, longitude };
+    if (!latitude || !longitude) {
+      const fullAddress = `${address},${district},${state}`;
+      console.log(fullAddress)
+      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`;
+      try {
+        console.log(geoUrl)
+        const response = await axios.get(geoUrl);
+        console.log(response.data)
+        if (response.data.length > 0) {
+          const { lat, lon } = response.data[0];
+          location.latitude = lat;
+          location.longitude = lon;
+        } else {
+          return res.status(400).json({ success: false, message: "Unable to fetch location please click on Get current location button" });
+        }
+      } catch (error) {
+        return res.status(500).json({ success: false, message: "Geocoding failed" });
+      }
     }
     const newDonor = await Donor.create({
       fullname,
@@ -30,6 +54,7 @@ const donorRegisterhandler = async (req, res) => {
       bloodGroup,
       state,
       district,
+      location,
       pincode,
       age,
     });
