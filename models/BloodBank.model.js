@@ -60,6 +60,16 @@ const bloodBankschema = new mongoose.Schema({
       "O-": 0,
     },
   },
+  location: {
+    latitude: {
+      type: Number,
+      required: false, // Set required to true if geolocation must be provided
+    },
+    longitude: {
+      type: Number,
+      required: false,
+    },
+  },
 });
 bloodBankschema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

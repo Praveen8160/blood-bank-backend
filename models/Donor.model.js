@@ -43,6 +43,16 @@ const donorSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    location: {
+      latitude: {
+        type: Number,
+        required: false, // Set required: true if you want geolocation to be mandatory
+      },
+      longitude: {
+        type: Number,
+        required: false,
+      },
+    },
   },
   { timestamps: true }
 );
