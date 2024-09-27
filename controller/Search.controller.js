@@ -18,7 +18,7 @@ const searchDonorHandler = async (req, res) => {
 };
 const getNearestDonor = async (req, res) => {
   const { latitude, longitude, bloodGroup } = req.body;
-  console.log(latitude, longitude);
+  // console.log(latitude, longitude);
   try {
     const Donors = await Donor.find({
       bloodGroup,
@@ -52,8 +52,28 @@ const searchBloodBankHandler = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+const getNearestBloodBank = async (req, res) => {
+  const { latitude, longitude } = req.body;
+  try {
+    const bloobank = await BloodBank.find({
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: [longitude, latitude] },
+          $maxDistance: 20000,
+        },
+      },
+    }).select("-password");
+    return res.status(200).json({ success: true, bloobank });
+  } catch (error) {
+    // console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   searchDonorHandler,
   searchBloodBankHandler,
   getNearestDonor,
+  getNearestBloodBank
 };
