@@ -1,5 +1,6 @@
 const BloodBank = require("../models/BloodBank.model.js");
 const { setUserToken } = require("../service/authentication.js");
+const axios = require("axios");
 const registerBloodBankHandler = async (req, res) => {
   try {
     const {
@@ -12,6 +13,8 @@ const registerBloodBankHandler = async (req, res) => {
       category,
       state,
       district,
+      latitude,
+      longitude,
       address,
       pincode,
     } = req.body;
@@ -21,6 +24,41 @@ const registerBloodBankHandler = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Email already exist" });
     }
+    let location = {
+      type: "Point",
+      coordinates: [longitude, latitude], // This is [longitude, latitude]
+    };
+
+    // If latitude or longitude is missing, perform geocoding
+    if (!latitude || !longitude) {
+      const fullAddress = `${address},${district},${state}`;
+      console.log(fullAddress);
+      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        fullAddress
+      )}`;
+
+      try {
+        console.log(geoUrl);
+        const response = await axios.get(geoUrl);
+        console.log(response.data);
+
+        if (response.data.length > 0) {
+          const { lat, lon } = response.data[0]; // Extract latitude and longitude
+          location.coordinates = [parseFloat(lon), parseFloat(lat)]; // Set coordinates in [longitude, latitude] format
+        } else {
+          return res.status(400).json({
+            success: false,
+            message:
+              "Unable to fetch location, please click on 'Get current location' button",
+          });
+        }
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ success: false, message: "Geocoding failed" });
+      }
+    }
+
     const newBloodBank = await BloodBank.create({
       bloodBankName,
       parentHospital,
@@ -31,6 +69,7 @@ const registerBloodBankHandler = async (req, res) => {
       category,
       state,
       district,
+      location,
       address,
       pincode,
     });

@@ -61,13 +61,14 @@ const bloodBankschema = new mongoose.Schema({
     },
   },
   location: {
-    latitude: {
-      type: Number,
-      required: false, // Set required to true if geolocation must be provided
+    type: {
+      type: String,
+      enum: ["Point"], // 'Point' is the only supported geometry type
+      required: true,
     },
-    longitude: {
-      type: Number,
-      required: false,
+    coordinates: {
+      type: [Number], // Array of numbers [longitude, latitude]
+      required: true,
     },
   },
 });
@@ -79,7 +80,7 @@ bloodBankschema.pre("save", async function (next) {
 bloodBankschema.methods.checkpassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
-
+bloodBankschema.index({ location: "2dsphere" });
 const bloodBankModel = mongoose.model("bloodBank", bloodBankschema);
 
 module.exports = bloodBankModel;

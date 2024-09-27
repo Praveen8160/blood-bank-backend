@@ -17,34 +17,55 @@ const donorRegisterhandler = async (req, res) => {
       pincode,
       age,
     } = req.body;
+
     console.log(latitude);
     console.log(longitude);
+
+    // Check if donor already exists
     const exist = await Donor.findOne({ email: email });
     if (exist) {
       return res
         .status(400)
-        .json({ success: false, message: "Email already exist" });
+        .json({ success: false, message: "Email already exists" });
     }
-    let location = { latitude, longitude };
+
+    // Initialize location object with the required structure
+    let location = {
+      type: "Point",
+      coordinates: [longitude, latitude], // This is [longitude, latitude]
+    };
+
+    // If latitude or longitude is missing, perform geocoding
     if (!latitude || !longitude) {
       const fullAddress = `${address},${district},${state}`;
-      console.log(fullAddress)
-      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`;
+      console.log(fullAddress);
+      const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        fullAddress
+      )}`;
+
       try {
-        console.log(geoUrl)
+        console.log(geoUrl);
         const response = await axios.get(geoUrl);
-        console.log(response.data)
+        console.log(response.data);
+
         if (response.data.length > 0) {
-          const { lat, lon } = response.data[0];
-          location.latitude = lat;
-          location.longitude = lon;
+          const { lat, lon } = response.data[0]; // Extract latitude and longitude
+          location.coordinates = [parseFloat(lon), parseFloat(lat)]; // Set coordinates in [longitude, latitude] format
         } else {
-          return res.status(400).json({ success: false, message: "Unable to fetch location please click on Get current location button" });
+          return res.status(400).json({
+            success: false,
+            message:
+              "Unable to fetch location, please click on 'Get current location' button",
+          });
         }
       } catch (error) {
-        return res.status(500).json({ success: false, message: "Geocoding failed" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Geocoding failed" });
       }
     }
+
+    // Create new donor
     const newDonor = await Donor.create({
       fullname,
       email,
@@ -54,18 +75,19 @@ const donorRegisterhandler = async (req, res) => {
       bloodGroup,
       state,
       district,
-      location,
+      location, // Pass the correctly formatted location object
       pincode,
       age,
     });
+
     if (newDonor) {
       return res
         .status(200)
-        .json({ success: true, nessage: "Donor Registred Successfully" });
+        .json({ success: true, message: "Donor registered successfully" });
     } else {
       return res.status(400).json({
         success: false,
-        message: "Donor Registration Failed please try again",
+        message: "Donor registration failed, please try again",
       });
     }
   } catch (error) {

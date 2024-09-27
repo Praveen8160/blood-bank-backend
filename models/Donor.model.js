@@ -44,13 +44,14 @@ const donorSchema = mongoose.Schema(
       required: true,
     },
     location: {
-      latitude: {
-        type: Number,
-        required: false, // Set required: true if you want geolocation to be mandatory
+      type: {
+        type: String,
+        enum: ["Point"], // 'Point' is the only supported geometry type
+        required: true,
       },
-      longitude: {
-        type: Number,
-        required: false,
+      coordinates: {
+        type: [Number], // Array of numbers [longitude, latitude]
+        required: true,
       },
     },
   },
@@ -65,6 +66,7 @@ donorSchema.pre("save", async function (next) {
 donorSchema.methods.checkpassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
+donorSchema.index({ location: "2dsphere" });
 const donorModel = mongoose.model("Donor", donorSchema);
 
 module.exports = donorModel;
