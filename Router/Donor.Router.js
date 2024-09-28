@@ -5,6 +5,7 @@ const {
   getDonorDatahandler,
   getTotalDonorhandler,
   UpdateDonorDatahandler,
+  getDonorLocation,
 } = require("../controller/Donor.controller");
 const checkAuthenticationCookie = require("../middleware/CookieAuthentication.middleware");
 const { route } = require("./Request.Router");
@@ -18,4 +19,5 @@ router.get(
 );
 router.put("/updateDonor", checkAuthenticationCookie("usertoken"),UpdateDonorDatahandler)
 router.get("/getTotalDonor",getTotalDonorhandler)
+router.get("/getDonorLocation",getDonorLocation)
 module.exports = router;

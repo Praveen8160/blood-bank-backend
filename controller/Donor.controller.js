@@ -190,10 +190,21 @@ const getTotalDonorhandler = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+const getDonorLocation = async (req, res) => {
+  try {
+    const donor = await Donor.find().select("location fullname bloodGroup");
+    return res.status(200).json({ success: true, donor });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   donorRegisterhandler,
   donorloginhnadler,
   getDonorDatahandler,
   getTotalDonorhandler,
   UpdateDonorDatahandler,
+  getDonorLocation
 };

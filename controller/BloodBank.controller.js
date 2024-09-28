@@ -269,6 +269,16 @@ const updateBloodbankDatahandler = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+const getBloodBankLocation = async (req, res) => {
+  try {
+    const bloodBank = await BloodBank.find().select("location bloodBankName");
+    return res.status(200).json({ success: true, bloodBank });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
 module.exports = {
   registerBloodBankHandler,
   loginBloodBankHandler,
@@ -279,4 +289,5 @@ module.exports = {
   getAvailableBlood,
   getTotalBloodBank,
   updateBloodbankDatahandler,
+  getBloodBankLocation
 };

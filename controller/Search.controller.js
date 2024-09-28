@@ -71,9 +71,10 @@ const getNearestBloodBank = async (req, res) => {
       .json({ success: false, message: "Internal Server Error" });
   }
 };
+
 module.exports = {
   searchDonorHandler,
   searchBloodBankHandler,
   getNearestDonor,
-  getNearestBloodBank
+  getNearestBloodBank,
 };
