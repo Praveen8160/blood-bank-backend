@@ -36,3 +36,6 @@ jobs:
             docker stop blood-bank-backend || true
             docker rm blood-bank-backend || true
             docker run -d --name blood-bank-backend --restart unless-stopped -p 4000:4000 ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:latest
+
+            
+            sudo systemctl reload nginx
