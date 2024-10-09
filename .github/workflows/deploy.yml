@@ -21,8 +21,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/bbm-backend:latest .
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/bbm-backend:latest
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:latest .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:latest
 
       - name: SSH into EC2 and Deploy
         uses: appleboy/ssh-action@v0.1.6  # Use the latest version
@@ -32,7 +32,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e  # Exit immediately if a command exits with a non-zero status
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/bbm-backend:latest || true  # Continue on error
-            docker stop bbm-backend || true
-            docker rm bbm-backend || true
-            docker run -d --name bbm-backend --restart unless-stopped -p 4000:4000 ${{ secrets.DOCKER_HUB_USERNAME }}/bbm-backend:latest
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:latest || true  # Continue on error
+            docker stop blood-bank-backend || true
+            docker rm blood-bank-backend || true
+            docker run -d --name blood-bank-backend --restart unless-stopped -p 4000:4000 ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:latest
