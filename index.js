@@ -44,6 +44,9 @@ const camprouter = require("./Router/Camp.Router.js");
 app.use("/api", (req, res) => {
   res.json({ message: "this is api route" });
 });
+app.use("/api/v1", (req, res) => {
+  res.json({ message: "this is api v1 route" });
+});
 app.use("/Donor", DonorRouter);
 app.use("/Search", SearchRouter);
 app.use("/bloodBank", BloodBankRouter);
