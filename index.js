@@ -48,6 +48,6 @@ app.use("/Authentication", authRouter);
 app.use("/bloodrequest", requestRouter);
 app.use("/camp", camprouter);
 
-server.listen(process.env.PORT || 5000, () =>
-  console.log(`Server running at http://localhost:${process.env.PORT || 5000}`)
+server.listen(process.env.PORT, () =>
+  console.log(`Server running at http://localhost:${process.env.PORT}`)
 );
