@@ -38,9 +38,9 @@ const authRouter = require("./Router/Authentication.Router.js");
 const requestRouter = require("./Router/Request.Router.js");
 const camprouter = require("./Router/Camp.Router.js");
 
-// app.use("/", (req, res) => {
-//   res.send("Welcome to the Blood Bank Backend");
-// });
+app.use("/", (req, res) => {
+  res.send("Welcome to the Blood Bank Backend");
+});
 app.use("/api", (req, res) => {
   res.json({ message: "this is api route" });
 });
