@@ -1,14 +1,14 @@
 services:
   backend:
-    image: praveen8160/blood-bank-backend:v1  # Docker image to use
-    container_name: blood-bank-backend  # Name of the container
+    image: praveen8160/blood-bank-backend:v1 # Docker image to use
+    container_name: blood-bank-backend # Name of the container
     ports:
-      - 4000:4000  # Maps host's port 4000 to container's port 4000
+      - 4000:4000 # Maps host's port 4000 to container's port 4000
     networks:
-      - backendNetwork  # Attaches the container to the custom network
+      - backendNetwork # Attaches the container to the custom network
     env_file:
-      - .env  # Loads environment variables from .env file
-      
+      - .env # Loads environment variables from .env file
+
 networks:
-  backendNetwork:  # Defines a custom bridge network
-    driver: bridge  # Network driver for isolation and communication
+  backendNetwork: # Defines a custom bridge network
+    driver: bridge # Network driver for isolation and communication
