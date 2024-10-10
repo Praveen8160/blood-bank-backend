@@ -21,7 +21,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:v1 .
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:v1 --platform linux/amd64 .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:v1
 
       - name: SSH into EC2 and Deploy
