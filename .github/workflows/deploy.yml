@@ -36,7 +36,7 @@ jobs:
             docker stop blood-bank-backend || true
             docker rm blood-bank-backend || true
             docker run -d --name blood-bank-backend --restart unless-stopped \
-              --env-file /path/to/your/.env \  # Load the .env file
+             --env-file /home/dockeruser/apps/bloodbank/.env \  # Load the .env file
               -p 4000:4000 ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:v1
 
             sudo systemctl reload nginx
