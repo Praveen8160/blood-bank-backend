@@ -6,7 +6,7 @@ const initSocket = (server) => {
   io = socketIo(server, {
     pingTimeout: 60000,
     cors: {
-      origin: "https://lifeflow.site",
+      origin: "https://www.lifeflow.site/",
     },
   });
 
