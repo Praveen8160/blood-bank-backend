@@ -15,7 +15,7 @@ initSocket(server);
 // Middleware setup
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://www.lifeflow.site",
     credentials: true,
   })
 );
