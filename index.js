@@ -16,6 +16,7 @@ initSocket(server);
 app.use(
   cors({
     origin: "https://www.lifeflow.site/",
+    methods: 'GET,POST,PUT,DELETE',  
     credentials: true,
   })
 );
