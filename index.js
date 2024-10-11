@@ -8,14 +8,13 @@ const { initSocket } = require("./service/socketHandler.js");
 const redisclient = require("./service/Redis.js");
 const app = express();
 const server = http.createServer(app);
-const allowedOrigins = ['https://lifeflow.site', 'https://www.lifeflow.site'];
 // Initialize Socket.IO
 initSocket(server);
 
 // Middleware setup
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: "https://lifeflow.site",
     methods: 'GET,POST,PUT,DELETE',  
     credentials: true,
   })
