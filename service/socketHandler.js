@@ -7,6 +7,7 @@ const initSocket = (server) => {
     pingTimeout: 60000,
     cors: {
       origin: ['https://www.lifeflow.site', 'https://lifeflow.site'],
+      credentials: true, // Allow credentials
     },
   });
 
