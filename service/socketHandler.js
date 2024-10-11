@@ -2,11 +2,12 @@ const socketIo = require("socket.io");
 let io;
 const activeUsers = new Map();
 const redisclient = require("./Redis.js");
+const allowedOrigins = ['https://lifeflow.site', 'https://www.lifeflow.site'];
 const initSocket = (server) => {
   io = socketIo(server, {
     pingTimeout: 60000,
     cors: {
-      origin: "https://www.lifeflow.site/",
+      origin: allowedOrigins,
     },
   });
 
