@@ -47,11 +47,11 @@ app.use("/Authentication", authRouter);
 app.use("/bloodrequest", requestRouter);
 app.use("/camp", camprouter);
 
+app.use("/error", (req, res) => { 
+  res.send("404 Not Found");
+});
 app.use("/", (req, res) => {
   res.send("Welcome");
-});
-app.use("/error", (req, res) => { 
-    res.send("404 Not Found");
 });
 
 server.listen(process.env.PORT, () =>
