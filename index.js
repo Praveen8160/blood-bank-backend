@@ -14,7 +14,7 @@ initSocket(server);
 // Middleware setup
 app.use(
   cors({
-    origin: "https://lifeflow.site",
+    origin: "https://www.lifeflow.site",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
@@ -48,7 +48,7 @@ app.use("/bloodrequest", requestRouter);
 app.use("/camp", camprouter);
 
 app.use("/error", (req, res) => { 
-  res.send("404 Not Found");
+  res.send("404 Not Found page");
 });
 app.use("/", (req, res) => {
   res.send("Welcome");
