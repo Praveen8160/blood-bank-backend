@@ -14,8 +14,8 @@ initSocket(server);
 // Middleware setup
 app.use(
   cors({
-    origin: ['https://www.lifeflow.site', 'https://lifeflow.site'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: "https://www.lifeflow.site",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );

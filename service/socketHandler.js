@@ -6,7 +6,7 @@ const initSocket = (server) => {
   io = socketIo(server, {
     pingTimeout: 60000,
     cors: {
-      origin: ['https://www.lifeflow.site', 'http://localhost:5173'], // Allow both origins
+      origin: 'https://www.lifeflow.site', // Allow both origins
       methods: ['GET', 'POST'],
       credentials: true, // Allow credentials if needed
     },
