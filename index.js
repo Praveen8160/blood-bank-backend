@@ -50,6 +50,9 @@ app.use("/camp", camprouter);
 app.use("/", (req, res) => {
   res.send("Welcome");
 });
+app.use("/error", (req, res) => { 
+    res.send("404 Not Found");
+});
 
 server.listen(process.env.PORT, () =>
   console.log(`Server running at http://localhost:${process.env.PORT}`)
