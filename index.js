@@ -47,9 +47,9 @@ app.use("/Authentication", authRouter);
 app.use("/bloodrequest", requestRouter);
 app.use("/camp", camprouter);
 
-// app.use("/", (req, res) => {
-//   res.send("Welcome to the Blood Bank Backend");
-// });
+app.use("/", (req, res) => {
+  res.send("Welcome");
+});
 
 server.listen(process.env.PORT, () =>
   console.log(`Server running at http://localhost:${process.env.PORT}`)
