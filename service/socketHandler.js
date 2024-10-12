@@ -6,9 +6,8 @@ const initSocket = (server) => {
   io = socketIo(server, {
     pingTimeout: 60000,
     cors: {
-      origin: 'https://www.lifeflow.site', 
-      methods: ['GET', 'POST'],
-      credentials: true, // Allow credentials if needed
+      origin: "https://www.lifeflow.site", 
+      credentials: true, 
     },
   });
 
