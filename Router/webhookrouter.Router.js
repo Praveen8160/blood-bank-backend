@@ -17,16 +17,16 @@ Router.post("/", async (req, res) => {
     //     name: "raj",
     //   },
     // ];
-    if (donors.length > 0) {
+    // if (donors.length > 0) {
       //   let donorList = donors.map((donor) => donor.name).join(', ');
       res.json({
         fulfillmentText: `Here are the donors with blood type ${bloodType}`,
       });
-    } else {
-      res.json({
-        fulfillmentText: `Sorry, we couldn't find any donors with blood type ${bloodType}.`,
-      });
-    }
+    // } else {
+    //   res.json({
+    //     fulfillmentText: `Sorry, we couldn't find any donors with blood type ${bloodType}.`,
+    //   });
+    // }
   } else {
     res.json({
       fulfillmentText: "I didn't understand your request.",
