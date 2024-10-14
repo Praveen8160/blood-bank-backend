@@ -36,6 +36,7 @@ const BloodBankRouter = require("./Router/BloodBank.Router.js");
 const authRouter = require("./Router/Authentication.Router.js");
 const requestRouter = require("./Router/Request.Router.js");
 const camprouter = require("./Router/Camp.Router.js");
+const webhookrouter = require("./Router/webhookrouter.Router.js");
 app.use("/api", (req, res) => {
   res.json({ message: "this is api route" });
 });
@@ -45,8 +46,9 @@ app.use("/bloodBank", BloodBankRouter);
 app.use("/Authentication", authRouter);
 app.use("/bloodrequest", requestRouter);
 app.use("/camp", camprouter);
+app.use("/webhook", webhookrouter);
 
-app.use("/error", (req, res) => { 
+app.use("/error", (req, res) => {
   res.send("404 Not Found page");
 });
 app.use("/", (req, res) => {
