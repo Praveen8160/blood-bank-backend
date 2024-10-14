@@ -7,7 +7,6 @@ Router.post("/", async (req, res) => {
   console.log("req.body.queryResult", req.body.queryResult);
   console.log("req.body.queryResult.intent", req.body.queryResult.intent);
   console.log("intentName", intentName);
-  res.send("ok");
   if (intentName === "FindDonorByBloodType") {
     const bloodType = req.body.queryResult.parameters.bloodType;
     console.log("bloodType", bloodType);
