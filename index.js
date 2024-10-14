@@ -51,9 +51,9 @@ app.use("/webhook", webhookrouter);
 app.use("/error", (req, res) => {
   res.send("404 Not Found page");
 });
-app.use("/", (req, res) => {
-  res.send("Welcome");
-});
+// app.use("/", (req, res) => {
+//   res.send("Welcome");
+// });
 
 server.listen(process.env.PORT, () =>
   console.log(`Server running at http://localhost:${process.env.PORT}`)
