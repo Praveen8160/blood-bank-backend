@@ -1,6 +1,6 @@
 const express = require("express");
 const Router = express.Router();
-
+const Donor = require("../models/Donor.model.js");
 Router.post("/", async (req, res) => {
   const intentName = req.body.queryResult.intent.displayName;
   console.log("body", req.body);
@@ -11,22 +11,19 @@ Router.post("/", async (req, res) => {
     const bloodType = req.body.queryResult.parameters.bloodType;
     console.log("bloodType", bloodType);
     // Query the database for matching donors
-    // const donors = await User.find({ bloodType });
-    // donors = [
-    //   {
-    //     name: "raj",
-    //   },
-    // ];
-    // if (donors.length > 0) {
-      //   let donorList = donors.map((donor) => donor.name).join(', ');
+    const donors = await Donor.find({ bloodGroup: bloodType }).select(
+      "fullname address state district pincode age"
+    );
+    if (donors.length > 0) {
+      let donorList = donors.map((donor) => donor.fullname).join(", ");
       res.json({
-        fulfillmentText: `Here are the donors with blood type ${bloodType}`,
+        fulfillmentText: `Here are the donors with blood type ${bloodType}: ${donorList}`,
       });
-    // } else {
-    //   res.json({
-    //     fulfillmentText: `Sorry, we couldn't find any donors with blood type ${bloodType}.`,
-    //   });
-    // }
+    } else {
+      res.json({
+        fulfillmentText: `Sorry, we couldn't find any donors with blood type ${bloodType}.`,
+      });
+    }
   } else {
     res.json({
       fulfillmentText: "I didn't understand your request.",
