@@ -17,7 +17,7 @@ Router.post("/", async (req, res) => {
     if (donors.length > 0) {
       let donorList = donors
         .map((donor) => {
-          return `Name: ${donor.fullname},\n Address: ${donor.address}, ${donor.state}, ${donor.district},${donor.pincode},\n Mobile: ${donor.mobile} \n _______________________`;
+          return `${donor.fullname}, ${donor.address}, ${donor.state}, ${donor.district}, Pincode: ${donor.pincode}, Age: ${donor.age}`;
         })
         .join("\n");
       res.json({
