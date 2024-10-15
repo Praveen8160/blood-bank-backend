@@ -11,8 +11,8 @@ Router.post("/", async (req, res) => {
     case "FindDonorByBloodType":
       console.log(req.body.queryResult.parameters);
       const bloodType = req.body.queryResult.parameters.bloodType;
-      const State = req.body.queryResult.parameters.geo - state;
-      const District = req.body.queryResult.parameters.geo - city;
+      const State = req.body.queryResult.parameters.geo-state;
+      const District = req.body.queryResult.parameters.geo-city;
       console.log(req.body.queryResult.parameters);
       console.log(State);
       console.log(District);
