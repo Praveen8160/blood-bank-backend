@@ -21,7 +21,7 @@ Router.post("/", async (req, res) => {
         })
         .join("\n");
       res.json({
-        fulfillmentText: `Here are the donors with blood type ${bloodType}: ${donorList}`,
+        fulfillmentText: `Here are the donors with blood type ${bloodType}:\n ${donorList}`,
       });
     } else {
       res.json({
