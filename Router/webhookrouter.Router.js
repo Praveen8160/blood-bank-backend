@@ -12,14 +12,14 @@ Router.post("/", async (req, res) => {
     console.log("bloodType", bloodType);
     // Query the database for matching donors
     const donors = await Donor.find({ bloodGroup: bloodType }).select(
-      "fullname address state district pincode age"
+      "fullname address state district pincode mobile"
     );
     if (donors.length > 0) {
       let donorList = donors
         .map((donor) => {
-          return `${donor.fullname}, ${donor.address}, ${donor.state}, ${donor.district}, Pincode: ${donor.pincode}, Age: ${donor.age}`;
+          return `Name: ${donor.fullname},Address: ${donor.address}${donor.state}${donor.district}${donor.pincode}, Mobile: ${donor.mobile} || `;
         })
-        .join("\n\n");
+        .join(",");
       res.json({
         fulfillmentText: `Here are the donors with blood type ${bloodType}:${"\n"}${donorList}`,
       });
