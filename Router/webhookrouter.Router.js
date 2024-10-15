@@ -19,9 +19,9 @@ Router.post("/", async (req, res) => {
         .map((donor) => {
           return `${donor.fullname}, ${donor.address}, ${donor.state}, ${donor.district}, Pincode: ${donor.pincode}, Age: ${donor.age}`;
         })
-        .join("\n");
+        .join("<br>");
       res.json({
-        fulfillmentText: `Here are the donors with blood type ${bloodType}:\n ${donorList}`,
+        fulfillmentText: `Here are the donors with blood type ${bloodType}:<br>${donorList}`,
       });
     } else {
       res.json({
