@@ -21,24 +21,23 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          # Tag the Docker image with the current Git commit SHA for uniqueness
-          TAG=${{ github.sha }}
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${TAG} --platform linux/amd64 .
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${TAG}
+          IMAGE_TAG=${{ github.sha }}  # Use commit hash as tag
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${IMAGE_TAG} --platform linux/amd64 .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${IMAGE_TAG} 
 
       - name: SSH into EC2 and Deploy
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@v0.1.6  # Use the latest version
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
-            TAG=${{ github.sha }}  # Use the same Git commit SHA tag for deployment
-            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${TAG} || true
+            IMAGE_TAG=${{ github.sha }} 
+            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${IMAGE_TAG} || true
             sudo docker stop blood-bank-backend || true
             sudo docker rm blood-bank-backend || true
             sudo docker run -d --name blood-bank-backend --restart unless-stopped \
-              --env-file /home/dockeruser/apps/bloodbank/.env \
-              -p 4000:4000 ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${TAG}
+            --env-file /home/dockeruser/apps/bloodbank/.env \
+            -p 4000:4000 ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${IMAGE_TAG} 
             sudo systemctl reload nginx
