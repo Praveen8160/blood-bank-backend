@@ -12,13 +12,7 @@ Router.post("/", async (req, res) => {
       console.log(req.body.queryResult.parameters);
       const bloodType = req.body.queryResult.parameters.bloodType;
       const State = req.body.queryResult.parameters.state;
-      console.log(State);
-      const District1 = req.body.queryResult.parameters.city;
-      console.log(District1);
-      const District = req.body.queryResult.parameters.geo-city;
-      console.log(req.body.queryResult.parameters);
-      console.log(State);
-      console.log(District);
+      const District = req.body.queryResult.parameters.city;
       const donors = await Donor.find({
         bloodGroup: bloodType,
         state: State,
