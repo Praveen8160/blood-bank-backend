@@ -21,7 +21,7 @@ jobs:
 
       - name: Build and Push Docker Image with Dynamic Tag
         run: |
-          IMAGE_TAG=${{ github.sha }}  # Use commit hash as tag
+          IMAGE_TAG=${{ github.sha }}  
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${IMAGE_TAG} --platform linux/amd64 .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/blood-bank-backend:${IMAGE_TAG}
 
