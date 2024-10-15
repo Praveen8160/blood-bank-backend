@@ -15,7 +15,11 @@ Router.post("/", async (req, res) => {
       "fullname address state district pincode age"
     );
     if (donors.length > 0) {
-      let donorList = donors.map((donor) => donor.fullname).join(", ");
+      let donorList = donors
+        .map((donor) => {
+          return `Name: ${donor.fullname},\n Address: ${donor.address}, ${donor.state}, ${donor.district},${donor.pincode},\n Mobile: ${donor.mobile} \n _______________________`;
+        })
+        .join("\n");
       res.json({
         fulfillmentText: `Here are the donors with blood type ${bloodType}: ${donorList}`,
       });
