@@ -3,10 +3,6 @@ const Router = express.Router();
 const Donor = require("../models/Donor.model.js");
 Router.post("/", async (req, res) => {
   const intentName = req.body.queryResult.intent.displayName;
-  // console.log("body", req.body);
-  // console.log("req.body.queryResult", req.body.queryResult);
-  // console.log("req.body.queryResult.intent", req.body.queryResult.intent);
-  // console.log("intentName", intentName);
   switch (intentName) {
     case "FindDonorByBloodType":
       console.log(req.body.queryResult.parameters);
@@ -21,9 +17,9 @@ Router.post("/", async (req, res) => {
       if (donors.length > 0) {
         let donorList = donors
           .map((donor) => {
-            return `Name: ${donor.fullname},Address: ${donor.address}${donor.state}${donor.district}${donor.pincode}, Mobile: ${donor.mobile} || `;
+            return `Name: ${donor.fullname} , Address: ${donor.address}${donor.state}${donor.district}${donor.pincode} , Mobile: ${donor.mobile}   ||   `;
           })
-          .join(",");
+          .join(" ");
         res.json({
           fulfillmentText: `Here are the donors with blood type ${bloodType}:${"\n"}${donorList}`,
         });
@@ -34,6 +30,11 @@ Router.post("/", async (req, res) => {
       }
       break;
     case "FindDonorByLocation":
+      const parameter=req.body.queryResult.parameters;
+      console.log(parameter)
+      res.json({
+        fulfillmentText: `Sorry, we couldn't find any donors with blood type`,
+      });
   }
 });
 module.exports = Router;
