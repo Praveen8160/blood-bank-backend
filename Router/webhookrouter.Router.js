@@ -10,8 +10,8 @@ Router.post("/", async (req, res) => {
   switch (intentName) {
     case "FindDonorByBloodType":
       const bloodType = req.body.queryResult.parameters.bloodType;
-      const State = req.body.queryResult.parameters.State;
-      const District = req.body.queryResult.parameters.District;
+      const State = req.body.queryResult.parameters.geo-state;
+      const District = req.body.queryResult.parameters.geo-city;
       const donors = await Donor.find({
         bloodGroup: bloodType,
         state: State,
