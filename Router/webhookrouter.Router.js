@@ -9,12 +9,13 @@ Router.post("/", async (req, res) => {
   // console.log("intentName", intentName);
   switch (intentName) {
     case "FindDonorByBloodType":
+      console.log(req.body.queryResult.parameters);
       const bloodType = req.body.queryResult.parameters.bloodType;
-      const State = req.body.queryResult.parameters.geo-state;
-      const District = req.body.queryResult.parameters.geo-city;
-      console.log(req.body.queryResult.parameters)
-      console.log(State)
-      console.log(District)
+      const State = req.body.queryResult.parameters.geo - state;
+      const District = req.body.queryResult.parameters.geo - city;
+      console.log(req.body.queryResult.parameters);
+      console.log(State);
+      console.log(District);
       const donors = await Donor.find({
         bloodGroup: bloodType,
         state: State,
