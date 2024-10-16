@@ -1,6 +1,7 @@
 const express = require("express");
 const Router = express.Router();
 const Donor = require("../models/Donor.model.js");
+const Camp = require("../models/Camp.model.js");
 Router.post("/", async (req, res) => {
   const intentName = req.body.queryResult.intent.displayName;
   let State = "";
@@ -33,9 +34,26 @@ Router.post("/", async (req, res) => {
       break;
     case "FindDonationCamp":
       const { State, District } = req.body.queryResult.parameters;
-      console.log(State, " ", District);
+      // console.log(State, " ", District);
+      const camps = await Camp.find({ state: State, district: District });
+      if (camps.length > 0) {
+        let campList = camps
+          .map((camp) => {
+            return `Name: ${camp.campName} , Address: ${camp.address}${camp.pincode} , Date: ${camp.date}   ||   `;
+          })
+          .join(" ");
+        res.json({
+          fulfillmentText: `Here are the camps in ${State} and ${District}:${"\n"}${campList}`,
+        });
+      } else {
+        res.json({
+          fulfillmentText: `Sorry, we couldn't find any camp in ${State} and ${District}.`,
+        });
+      }
+      break;
+    default:
       res.json({
-        fulfillmentText: `Sorry, we couldn't find any camp in ${State} and ${District}.`,
+        fulfillmentText: `Sorry, we couldn't understand your request.`,
       });
   }
 });
