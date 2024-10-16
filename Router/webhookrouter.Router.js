@@ -56,7 +56,7 @@ Router.post("/", async (req, res) => {
       break;
     case "FindBloodBank":
       State = req.body.queryResult.parameters.State;
-      District = req.body.queryResult.parameters.District;
+      District = req.body.queryResult.parameters.City;
       const bloodBanks = await BloodBank.find({
         state: State,
         district: District,
