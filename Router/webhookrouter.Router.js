@@ -84,11 +84,10 @@ Router.post("/", async (req, res) => {
       //   stste: State,
       //   district: District,
       // }).select("bloodBankName address pincode mobile availableBloods");
-      const bloodBank= await BloodBank.find({
+      const bloodBank = await BloodBank.find({
         state: State,
         district: District,
       }).select("bloodBankName address pincode mobile availableBloods");
-      console.log(bloodBank)
       if (bloodBank.length > 0) {
         const bloodbank = bloodBank.filter((bank) => {
           return (
@@ -96,10 +95,18 @@ Router.post("/", async (req, res) => {
             bank.availableBloods.get(bloodgroup) >= 0
           );
         });
-        // console.log(bloodbank);
-        res.json({
-          fulfillmentText: `Here are the Bloodbank : ${bloodbank}`,
-        });
+        if (bloodbank.length === 0) {
+          res.json({
+            fulfillmentText: `Sorry, we couldn't find any blood bank with ${bloodType} Available blood.`,
+          });
+        } else {
+          const listofbloodbank = bloodbank.map((bank) => {
+            return `BloodBank: ${bank.bloodBankName} , Address: ${bank.address}${bank.pincode} , Mobile: ${bank.mobile}   ||   `;
+          });
+          res.json({
+            fulfillmentText: `Here are the Bloodbank : \n ${listofbloodbank}`,
+          });
+        }
       } else {
         res.json({
           fulfillmentText: `Sorry, we couldn't find any blood bank in ${State} and ${District}.`,
