@@ -3,12 +3,14 @@ const Router = express.Router();
 const Donor = require("../models/Donor.model.js");
 Router.post("/", async (req, res) => {
   const intentName = req.body.queryResult.intent.displayName;
+  let State = "";
+  let District = "";
   switch (intentName) {
     case "FindDonorByBloodType":
       console.log(req.body.queryResult.parameters);
       const bloodType = req.body.queryResult.parameters.bloodType;
-      const State = req.body.queryResult.parameters.state;
-      const District = req.body.queryResult.parameters.city;
+      State = req.body.queryResult.parameters.state;
+      District = req.body.queryResult.parameters.city;
       const donors = await Donor.find({
         bloodGroup: bloodType,
         state: State,
@@ -29,11 +31,11 @@ Router.post("/", async (req, res) => {
         });
       }
       break;
-    case "FindDonorByLocation":
-      const parameter=req.body.queryResult.parameters;
-      console.log(parameter)
+    case "FindDonationCamp":
+      const { State, District } = req.body.queryResult.parameters;
+      console.log(State, " ", District);
       res.json({
-        fulfillmentText: `Sorry, we couldn't find any donors with blood type`,
+        fulfillmentText: `Sorry, we couldn't find any camp in ${State} and ${District}.`,
       });
   }
 });
