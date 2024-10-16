@@ -2,14 +2,16 @@ const express = require("express");
 const Router = express.Router();
 const Donor = require("../models/Donor.model.js");
 const Camp = require("../models/Camp.model.js");
+const BloodBank = require("../models/BloodBank.model.js");
 Router.post("/", async (req, res) => {
   const intentName = req.body.queryResult.intent.displayName;
   let State = "";
   let District = "";
+  let bloodType = "";
   switch (intentName) {
     case "FindDonorByBloodType":
       console.log(req.body.queryResult.parameters);
-      const bloodType = req.body.queryResult.parameters.bloodType;
+      bloodType = req.body.queryResult.parameters.bloodType;
       State = req.body.queryResult.parameters.state;
       District = req.body.queryResult.parameters.city;
       const donors = await Donor.find({
@@ -33,7 +35,8 @@ Router.post("/", async (req, res) => {
       }
       break;
     case "FindDonationCamp":
-      const { State, District } = req.body.queryResult.parameters;
+      State = req.body.queryResult.parameters.State;
+      District = req.body.queryResult.parameters.District;
       // console.log(State, " ", District);
       const camps = await Camp.find({ state: State, district: District });
       if (camps.length > 0) {
@@ -45,6 +48,28 @@ Router.post("/", async (req, res) => {
         res.json({
           fulfillmentText: `Here are the camps in ${State} and ${District}:${"\n"}${campList}`,
         });
+      } else {
+        res.json({
+          fulfillmentText: `Sorry, we couldn't find any camp in ${State} and ${District}.`,
+        });
+      }
+      break;
+    case "FindBloodBank":
+      State = req.body.queryResult.parameters.State;
+      District = req.body.queryResult.parameters.District;
+      const bloodBanks = await BloodBank.find({
+        state: State,
+        district: District,
+      }).select("bloodBankName address pincode").select("bloodBankName address pincode mobile");
+      if (bloodBanks.length > 0) {
+        const bloodbankList = bloodBanks
+          .map((bank) => {
+            return `BloodBank: ${bank.bloodBankName} , Address: ${bank.address}${bank.pincode} , Mobile: ${bank.mobile}   ||   `;
+          })
+          .join(" ");
+          res.json({
+            fulfillmentText: `Here are the Bloodbank in ${State} and ${District}:${"\n"}${bloodbankList}`,
+          });
       } else {
         res.json({
           fulfillmentText: `Sorry, we couldn't find any camp in ${State} and ${District}.`,
