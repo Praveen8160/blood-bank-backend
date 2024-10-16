@@ -92,7 +92,7 @@ Router.post("/", async (req, res) => {
         const bloodbank = bloodBank.filter((bank) => {
           return (
             bank.availableBloods.has(bloodType) &&
-            bank.availableBloods.get(bloodType) >= 0
+            bank.availableBloods.get(bloodType) > 0
           );
         });
         if (bloodbank.length === 0) {
