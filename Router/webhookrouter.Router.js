@@ -80,12 +80,17 @@ Router.post("/", async (req, res) => {
       bloodType = req.body.queryResult.parameters.bloodType;
       State = req.body.queryResult.parameters.State;
       District = req.body.queryResult.parameters.City;
-      const bloodbankList = await BloodBank.find({
-        stste: State,
+      // const bloodbankList = await BloodBank.find({
+      //   stste: State,
+      //   district: District,
+      // }).select("bloodBankName address pincode mobile availableBloods");
+      const bloodBank= await BloodBank.find({
+        state: State,
         district: District,
       }).select("bloodBankName address pincode mobile availableBloods");
-      if (bloodbankList.length > 0) {
-        const bloodbank = bloodbankList.filter((bank) => {
+      console.log(bloodBank)
+      if (bloodBank.length > 0) {
+        const bloodbank = bloodBank.filter((bank) => {
           return (
             bank.availableBloods.has(bloodType) &&
             bank.availableBloods.get(bloodgroup) >= 0
