@@ -60,19 +60,44 @@ Router.post("/", async (req, res) => {
       const bloodBanks = await BloodBank.find({
         state: State,
         district: District,
-      }).select("bloodBankName address pincode").select("bloodBankName address pincode mobile");
+      }).select("bloodBankName address pincode mobile");
       if (bloodBanks.length > 0) {
         const bloodbankList = bloodBanks
           .map((bank) => {
             return `BloodBank: ${bank.bloodBankName} , Address: ${bank.address}${bank.pincode} , Mobile: ${bank.mobile}   ||   `;
           })
           .join(" ");
-          res.json({
-            fulfillmentText: `Here are the Bloodbank in ${State} and ${District}:${"\n"}${bloodbankList}`,
-          });
+        res.json({
+          fulfillmentText: `Here are the Bloodbank in ${State} and ${District}:${"\n"}${bloodbankList}`,
+        });
       } else {
         res.json({
           fulfillmentText: `Sorry, we couldn't find any camp in ${State} and ${District}.`,
+        });
+      }
+      break;
+    case "CheckBloodAvailability":
+      bloodType = req.body.queryResult.parameters.bloodType;
+      State = req.body.queryResult.parameters.State;
+      District = req.body.queryResult.parameters.City;
+      const bloodbankList = await BloodBank.find({
+        stste: State,
+        district: District,
+      }).select("bloodBankName address pincode mobile availableBloods");
+      if (bloodbankList.length > 0) {
+        const bloodbank = bloodbankList.filter((bank) => {
+          return (
+            bank.availableBloods.has(bloodType) &&
+            bank.availableBloods.get(bloodgroup) >= 0
+          );
+        });
+        // console.log(bloodbank);
+        res.json({
+          fulfillmentText: `Here are the Bloodbank : ${bloodbank}`,
+        });
+      } else {
+        res.json({
+          fulfillmentText: `Sorry, we couldn't find any blood bank in ${State} and ${District}.`,
         });
       }
       break;
