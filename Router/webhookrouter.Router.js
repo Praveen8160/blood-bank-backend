@@ -77,7 +77,7 @@ Router.post("/", async (req, res) => {
       }
       break;
     case "CheckBloodAvailability":
-      bloodType = req.body.queryResult.parameters.bloodType;
+      bloodType = req.body.queryResult.parameters.bloodtype;
       State = req.body.queryResult.parameters.State;
       District = req.body.queryResult.parameters.City;
       // const bloodbankList = await BloodBank.find({
